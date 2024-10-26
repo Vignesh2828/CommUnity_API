@@ -9,14 +9,13 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: 'http://192.168.29.5:8081', 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  }));
-  
+  origin: 'http://192.168.29.5:8081', 
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 app.use(express.json());
 
-// Create a MySQL connection
+// Create and connect MySQL database
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -24,7 +23,6 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-// Connect to MySQL
 db.connect((err) => {
   if (err) {
     console.error('Error connecting to MySQL:', err);
@@ -33,11 +31,16 @@ db.connect((err) => {
   console.log('Connected to MySQL');
 });
 
-// Import the routes at the top of server.js
+// Import and use routes
+const userRoutes = require('./routes/users');
 const serviceRoutes = require('./routes/services');
+const reviewRoutes = require('./routes/reviews');
+const reportRoutes = require('./routes/reports');
 
-// Use the service routes
+app.use('/api/users', userRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
